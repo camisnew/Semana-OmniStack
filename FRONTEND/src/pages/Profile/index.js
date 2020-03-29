@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Link} from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { FiPower, FiTrash2 } from 'react-icons/fi';
 
 import api from '../../services/api';
@@ -10,14 +10,12 @@ import logoImg from '../../assets/logo.svg';
 
 
 export default function Profile() {
-
+    const history = useHistory();
 
     const [incidents, setIncidents] = useState([]);
 
     const ongName = localStorage.getItem('ongName');
-    
     const ongId = localStorage.getItem('ongId');
-    console.log(ongId);
 
     useEffect( () => {
         api.get('profile', {
@@ -29,6 +27,25 @@ export default function Profile() {
         })
     }, [ongId] );
 
+    const handleDeleteIncident = async (id) => {
+        try {
+            await api.delete(`incidents/${id}`, {
+                headers: {
+                    Authorization: ongId
+                }
+            });
+
+            setIncidents(incidents.filter(incident => incident.id !== id))
+        } catch (err) {
+            alert(`Ops! Não foi possível deletar esse incidente.\nDetalhes:\n${err}`);
+        }
+    }
+
+    const handleLogout = () => {
+        localStorage.clear();
+        history.push('/');
+    }
+
     return (
         <div className="profile-container">
             <header>
@@ -36,7 +53,7 @@ export default function Profile() {
                 <span>Bem-vinda, {ongName}</span>
 
                 <Link className="button" to="/incidents/new">Cadastrar novo caso</Link>
-                <button type="button">
+                <button type="button" onClick={handleLogout}>
                     <FiPower size={18} color="#E02041"/>
                 </button>
             </header>
@@ -45,7 +62,6 @@ export default function Profile() {
 
             <ul>
                 {incidents.map(incident => {
-                    console.log(incident);
                     return (<li key ={incident.id}>
                         <strong>Caso:</strong>
                         <p>{incident.title}</p>
@@ -56,7 +72,7 @@ export default function Profile() {
                         <strong>VALOR:</strong>
                         <p>R$ {incident.value}</p>
 
-                        <button type="button"><FiTrash2 size={20} color="#a8a8b3" /></button>
+                        <button type="button" onClick={() => handleDeleteIncident(incident.id)}><FiTrash2 size={20} color="#a8a8b3" /></button>
                     </li>)                    
                 })}
             </ul>
