@@ -8,7 +8,6 @@ import './styles.css';
 
 import logoImg from '../../assets/logo.svg';
 
-
 export default function Profile() {
     const history = useHistory();
 

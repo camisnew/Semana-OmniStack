@@ -34,8 +34,6 @@ export default function NewIncident() {
         } catch (err) {
             alert(`Erro ao cadastrar! Tente novamente.\nDetalhes:\n ${err}`)
         }
-
-
     }
 
     return (
